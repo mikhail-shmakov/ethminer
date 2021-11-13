@@ -209,13 +209,6 @@ void CUDAMiner::workLoop()
             const WorkPackage w = work();
             if (!w)
             {
-                cout << "w.job: " << w.job << endl;
-                cout << "w.block: " << w.block << endl;
-                cout << "w.seed: " << w.seed << endl;
-                cout << "w.startNonce: " << w.startNonce << endl;
-                cout << "w.epoch: " << w.epoch << endl;
-                cout << "w.boundary: " << w.boundary << endl;
-                cout << "w.header: " << w.header << endl;
                 boost::system_time const timeout =
                     boost::get_system_time() + boost::posix_time::seconds(3);
                 boost::mutex::scoped_lock l(x_work);
@@ -241,6 +234,14 @@ void CUDAMiner::workLoop()
             current = w;
             uint64_t upper64OfBoundary = (uint64_t)(u64)((u256)current.boundary >> 192);
 
+            cout << "w.job: " << w.job << endl;
+            cout << "w.block: " << w.block << endl;
+            cout << "w.seed: " << w.seed << endl;
+            cout << "w.startNonce: " << w.startNonce << endl;
+            cout << "w.epoch: " << w.epoch << endl;
+            cout << "w.boundary: " << w.boundary << endl;
+            cout << "w.header: " << w.header << endl;
+            
             // Eventually start searching
             cout << "start searching (is it mining?)" << endl;
             search(current.header.data(), upper64OfBoundary, current.startNonce, w);
