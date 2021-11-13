@@ -86,20 +86,20 @@ __global__ void ethash_calculate_dag_item(uint32_t start)
 void ethash_generate_dag(
     uint64_t dag_size, uint32_t gridSize, uint32_t blockSize, cudaStream_t stream)
 {
-    std::cout << "ethash_generate_dag func" << std::endl;
+    cudalog << "ethash_generate_dag func";
     const uint32_t work = (uint32_t)(dag_size / sizeof(hash64_t));
     const uint32_t run = gridSize * blockSize;
 
     uint32_t base;
     for (base = 0; base <= work - run; base += run)
     {
-        std::cout << "ethash_generate_dag func base <= work - run" << std::endl;
+        cudalog << "ethash_generate_dag func base <= work - run";
         ethash_calculate_dag_item<<<gridSize, blockSize, 0, stream>>>(base);
         CUDA_SAFE_CALL(cudaDeviceSynchronize());
     }
     if (base < work)
     {
-        std::cout << "ethash_generate_dag func if (base < work)" << std::endl;
+        cudalog << "ethash_generate_dag func if (base < work)";
         uint32_t lastGrid = work - base;
         lastGrid = (lastGrid + blockSize - 1) / blockSize;
         ethash_calculate_dag_item<<<lastGrid, blockSize, 0, stream>>>(base);
@@ -110,7 +110,7 @@ void ethash_generate_dag(
 
 void set_constants(hash128_t* _dag, uint32_t _dag_size, hash64_t* _light, uint32_t _light_size)
 {
-    std::cout << "set constants func" << std::endl;
+    cudalog << "set constants func";
     CUDA_SAFE_CALL(cudaMemcpyToSymbol(d_dag, &_dag, sizeof(hash128_t*)));
     CUDA_SAFE_CALL(cudaMemcpyToSymbol(d_dag_size, &_dag_size, sizeof(uint32_t)));
     CUDA_SAFE_CALL(cudaMemcpyToSymbol(d_light, &_light, sizeof(hash64_t*)));
