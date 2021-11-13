@@ -209,7 +209,6 @@ void CUDAMiner::workLoop()
             const WorkPackage w = work();
             if (!w)
             {
-                w.job
                 cout << "w.job: " << w.job << endl;
                 cout << "w.block: " << w.block << endl;
                 cout << "w.seed: " << w.seed << endl;
