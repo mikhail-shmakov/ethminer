@@ -83,8 +83,8 @@ bool CUDAMiner::initEpoch_internal()
     auto startInit = std::chrono::steady_clock::now();
     size_t RequiredTotalMemory = (m_epochContext.dagSize + m_epochContext.lightSize);
     size_t RequiredDagMemory = m_epochContext.dagSize;
-    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(RequiredTotalMemory, "GB") << endl;
-    cout << "RequiredDagMemory: " << dev::getFormattedMemory(RequiredDagMemory, "GB") << endl;
+    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(RequiredTotalMemory) << endl;
+    cout << "RequiredDagMemory: " << dev::getFormattedMemory(RequiredDagMemory) << endl;
 
     // Release the pause flag if any
     resume(MinerPauseEnum::PauseDueToInsufficientMemory);
