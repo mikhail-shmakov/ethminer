@@ -54,11 +54,6 @@ bool CUDAMiner::initDevice()
             << " (Compute " + m_deviceDescriptor.cuCompute + ") Available VRAM Memory : "
             << dev::getFormattedMemory((double)m_deviceDescriptor.totalMemory);
 
-    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(m_epochContext.dagSize + m_epochContext.lightSize) << endl;
-    cout << "RequiredDagMemory: " << dev::getFormattedMemory(m_epochContext.dagSize) << endl;
-    cout << "Dag file consist of: " << m_epochContext.dagNumItems << endl;
-    cout << "Light file consist of: " << m_epochContext.lightNumItems << endl;
-
     // Set Hardware Monitor Info
     m_hwmoninfo.deviceType = HwMonitorInfoType::NVIDIA;
     m_hwmoninfo.devicePciId = m_deviceDescriptor.uniqueId;
@@ -88,6 +83,10 @@ bool CUDAMiner::initEpoch_internal()
     auto startInit = std::chrono::steady_clock::now();
     size_t RequiredTotalMemory = (m_epochContext.dagSize + m_epochContext.lightSize);
     size_t RequiredDagMemory = m_epochContext.dagSize;
+    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(m_epochContext.dagSize + m_epochContext.lightSize) << endl;
+    cout << "RequiredDagMemory: " << dev::getFormattedMemory(m_epochContext.dagSize) << endl;
+    cout << "Dag file consist of: " << m_epochContext.dagNumItems << endl;
+    cout << "Light file consist of: " << m_epochContext.lightNumItems << endl;
 
     // Release the pause flag if any
     resume(MinerPauseEnum::PauseDueToInsufficientMemory);
