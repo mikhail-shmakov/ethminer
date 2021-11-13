@@ -51,8 +51,13 @@ CUDAMiner::~CUDAMiner()
 bool CUDAMiner::initDevice()
 {
     cudalog << "Using Pci Id : " << m_deviceDescriptor.uniqueId << " " << m_deviceDescriptor.cuName
-            << " (Compute " + m_deviceDescriptor.cuCompute + ") Memory : "
+            << " (Compute " + m_deviceDescriptor.cuCompute + ") Available VRAM Memory : "
             << dev::getFormattedMemory((double)m_deviceDescriptor.totalMemory);
+
+    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(m_epochContext.dagSize + m_epochContext.lightSize) << endl;
+    cout << "RequiredDagMemory: " << dev::getFormattedMemory(m_epochContext.dagSize) << endl;
+    cout << "Dag file consist of: " << m_epochContext.dagNumItems << endl;
+    cout << "Light file consist of: " << m_epochContext.lightNumItems << endl;
 
     // Set Hardware Monitor Info
     m_hwmoninfo.deviceType = HwMonitorInfoType::NVIDIA;
@@ -83,8 +88,6 @@ bool CUDAMiner::initEpoch_internal()
     auto startInit = std::chrono::steady_clock::now();
     size_t RequiredTotalMemory = (m_epochContext.dagSize + m_epochContext.lightSize);
     size_t RequiredDagMemory = m_epochContext.dagSize;
-    cout << "RequiredTotalMemory: " << dev::getFormattedMemory(RequiredTotalMemory) << endl;
-    cout << "RequiredDagMemory: " << dev::getFormattedMemory(RequiredDagMemory) << endl;
 
     // Release the pause flag if any
     resume(MinerPauseEnum::PauseDueToInsufficientMemory);
@@ -203,6 +206,7 @@ void CUDAMiner::workLoop()
         while (!shouldStop())
         {
             // Wait for work or 3 seconds (whichever the first)
+            cout << "set w = work()" << endl;
             const WorkPackage w = work();
             if (!w)
             {
@@ -232,6 +236,7 @@ void CUDAMiner::workLoop()
             uint64_t upper64OfBoundary = (uint64_t)(u64)((u256)current.boundary >> 192);
 
             // Eventually start searching
+            cout << "start searching (is it mining?)" << endl;
             search(current.header.data(), upper64OfBoundary, current.startNonce, w);
         }
 
@@ -327,6 +332,7 @@ void CUDAMiner::enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollecti
 void CUDAMiner::search(
     uint8_t const* header, uint64_t target, uint64_t start_nonce, const dev::eth::WorkPackage& w)
 {
+    cout << "It is search function" << endl;
     set_header(*reinterpret_cast<hash32_t const*>(header));
     if (m_current_target != target)
     {
@@ -339,6 +345,7 @@ void CUDAMiner::search(
     for (current_index = 0; current_index < m_settings.streams;
          current_index++, start_nonce += m_batch_size)
     {
+        cout << "first cycle where run_ethash_search" << endl;
         cudaStream_t stream = m_streams[current_index];
         volatile Search_results& buffer(*m_search_buf[current_index]);
         buffer.count = 0;
@@ -353,6 +360,7 @@ void CUDAMiner::search(
 
     while (!done)
     {
+        cout << "while (!done) cycle where second run_ethash_search appear" << endl;
         // Exit next time around if there's new work awaiting
         bool t = true;
         done = m_new_work.compare_exchange_strong(t, false);
